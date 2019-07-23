@@ -1,0 +1,40 @@
+# pipeline.yaml
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: test-pipeline
+spec:
+  resources:
+    - name: gitSource
+      type: git
+    - name: dockerImage
+      type: image
+  tasks:
+    - name: build-image
+      taskRef:
+        name: test-doker-image
+      resources:
+        inputs:
+          - name: app
+            resource: gitSource
+        outputs:
+          - name: builtImage
+            resource: dockerImage
+    - name: deploy-kubernetes
+      taskRef:
+        name: test-deploy
+      resources:
+        inputs:
+          - name: source
+            resource: gitSource
+          - name: image
+            resource: dockerImage
+            from:
+              - build-image
+      params:
+        - name: manifestPath
+          value: /workspace/source/deployment.yaml
+        - name: yqArg
+          value: "-d0"
+        - name: yamlPathToImage
+          value: "spec.template.spec.containers[0].image"

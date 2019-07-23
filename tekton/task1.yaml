@@ -1,0 +1,34 @@
+# task1.yaml
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: test-deploy
+spec:
+  inputs:
+    resources:
+      - name: source
+        type: git
+      - name: image
+        type: image
+    params:
+      - name: manifestPath
+      - name: yqArg
+      - name: yamlPathToImage
+  steps:
+    - name: replace-image
+      image: mikefarah/yq
+      command: ["yq"]
+      args:
+        - w
+        - -i
+        - ${inputs.params.yqArg}
+        - ${inputs.params.manifestPath}
+        - ${inputs.params.yamlPathToImage}
+        - ${inputs.resources.image.url}
+    - name: run-kubectl
+      image: bitnami/kubectl
+      command: ["kubectl"]
+      args:
+        - apply
+        - -f
+        - ${inputs.params.manifestPath}

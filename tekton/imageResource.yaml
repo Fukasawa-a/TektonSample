@@ -1,0 +1,11 @@
+# imageResource.yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: easydoggie-test-image
+  namespace: default
+spec:
+  type: image
+  params:
+    - name: url
+      value: easydoggie/testapp

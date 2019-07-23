@@ -1,0 +1,16 @@
+# pipelinerun.yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: test-pipelinerun
+spec:
+  serviceAccount: build-bot
+  pipelineRef:
+    name: test-pipeline
+  resources:
+    - name: gitSource
+      resourceRef:
+        name: easydoggie-git
+    - name: dockerImage
+      resourceRef:
+        name: easydoggie-test-image
